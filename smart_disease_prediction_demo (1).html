@@ -1,0 +1,345 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{padding:1.5rem 0}
+.header{text-align:center;margin-bottom:2rem}
+.header h1{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.header p{font-size:14px;color:var(--color-text-secondary);margin-top:4px}
+.tabs{display:flex;gap:8px;margin-bottom:1.5rem;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:0}
+.tab{padding:8px 16px;font-size:14px;cursor:pointer;color:var(--color-text-secondary);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.section-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field label{font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px}
+.field input,.field select{width:100%;padding:8px 10px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--color-border-primary)}
+.predict-btn{width:100%;padding:12px;font-size:15px;font-weight:500;background:var(--color-text-primary);color:var(--color-background-primary);border:none;border-radius:var(--border-radius-lg);cursor:pointer;margin-top:1rem}
+.predict-btn:hover{opacity:.85}
+.result-card{border-radius:var(--border-radius-lg);padding:1.5rem;margin-bottom:1rem;border:0.5px solid var(--color-border-tertiary)}
+.result-card.high{background:#FCEBEB;border-color:#F09595}
+.result-card.mod{background:#FAEEDA;border-color:#FAC775}
+.result-card.low{background:#EAF3DE;border-color:#C0DD97}
+.result-label{font-size:13px;font-weight:500;margin-bottom:4px}
+.result-label.high{color:#A32D2D}
+.result-label.mod{color:#854F0B}
+.result-label.low{color:#3B6D11}
+.result-pred{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.prob-bar-wrap{margin-top:12px}
+.prob-bar-bg{background:var(--color-background-secondary);border-radius:999px;height:8px;overflow:hidden}
+.prob-bar-fill{height:8px;border-radius:999px;transition:width .6s ease}
+.prob-label{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;text-align:center}
+.metric .val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.metric .lbl{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.recs{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:1rem}
+.rec-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--border-radius-md);font-size:13px;line-height:1.5}
+.rec-item.danger{background:#FCEBEB;color:#791F1F}
+.rec-item.warn{background:#FAEEDA;color:#633806}
+.rec-item.info{background:#E6F1FB;color:#0C447C}
+.rec-item.ok{background:#EAF3DE;color:#27500A}
+.rec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.rec-item.danger .rec-dot{background:#E24B4A}
+.rec-item.warn .rec-dot{background:#EF9F27}
+.rec-item.info .rec-dot{background:#378ADD}
+.rec-item.ok .rec-dot{background:#639922}
+.feature-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px}
+.feature-row:last-child{border-bottom:none}
+.feat-name{color:var(--color-text-secondary)}
+.feat-bar{display:flex;align-items:center;gap:8px}
+.feat-mini{width:80px;height:6px;background:var(--color-background-secondary);border-radius:999px;overflow:hidden}
+.feat-mini-fill{height:100%;border-radius:999px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:500}
+.badge.high{background:#FCEBEB;color:#A32D2D}
+.badge.mod{background:#FAEEDA;color:#854F0B}
+.badge.low{background:#EAF3DE;color:#3B6D11}
+.apriori-rule{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:8px;font-size:13px}
+.rule-main{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.rule-ant{background:#EEEDFE;color:#3C3489;padding:3px 8px;border-radius:var(--border-radius-md);font-size:12px}
+.rule-arrow{color:var(--color-text-secondary);font-size:16px}
+.rule-cons{background:#E1F5EE;color:#085041;padding:3px 8px;border-radius:var(--border-radius-md);font-size:12px}
+.rule-stats{display:flex;gap:12px}
+.stat-pill{font-size:11px;color:var(--color-text-secondary)}
+.stat-pill span{color:var(--color-text-primary);font-weight:500}
+.hidden{display:none}
+.sample-btns{display:flex;gap:8px;margin-bottom:1rem}
+.sample-btn{padding:6px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:none;color:var(--color-text-secondary);cursor:pointer}
+.sample-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+</style>
+
+<h2 class="sr-only">Smart Disease Prediction System — Interactive Demo</h2>
+
+<div class="app">
+  <div class="header">
+    <h1>Smart Disease Prediction System</h1>
+    <p>AI/ML Project — Logistic Regression + Apriori + Expert System</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('predict')">Predict</button>
+    <button class="tab" onclick="showTab('model')">Model Stats</button>
+    <button class="tab" onclick="showTab('apriori')">Apriori Rules</button>
+    <button class="tab" onclick="showTab('about')">How it works</button>
+  </div>
+
+  <!-- PREDICT TAB -->
+  <div id="tab-predict">
+    <div class="section">
+      <div class="section-title">Quick load sample</div>
+      <div class="sample-btns">
+        <button class="sample-btn" onclick="loadSample('low')">Sample A — low risk (45yr)</button>
+        <button class="sample-btn" onclick="loadSample('high')">Sample B — high risk (65yr)</button>
+        <button class="sample-btn" onclick="loadSample('moderate')">Sample C — moderate (55yr)</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Patient information</div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Age</label><input type="number" id="age" value="45" min="20" max="90"></div>
+        <div class="field"><label>Sex</label><select id="sex"><option value="0">Female</option><option value="1">Male</option></select></div>
+        <div class="field"><label>Chest pain type (0–3)</label><input type="number" id="cp" value="0" min="0" max="3"></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Resting BP (mmHg)</label><input type="number" id="trestbps" value="120" min="80" max="220"></div>
+        <div class="field"><label>Cholesterol (mg/dl)</label><input type="number" id="chol" value="200" min="100" max="600"></div>
+        <div class="field"><label>Fasting blood sugar &gt;120</label><select id="fbs"><option value="0">No</option><option value="1">Yes</option></select></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Resting ECG (0–2)</label><input type="number" id="restecg" value="0" min="0" max="2"></div>
+        <div class="field"><label>Max heart rate</label><input type="number" id="thalach" value="160" min="60" max="220"></div>
+        <div class="field"><label>Exercise angina</label><select id="exang"><option value="0">No</option><option value="1">Yes</option></select></div>
+      </div>
+      <div class="grid3">
+        <div class="field"><label>ST depression (oldpeak)</label><input type="number" id="oldpeak" value="0.5" min="0" max="7" step="0.1"></div>
+        <div class="field"><label>Slope (0–2)</label><input type="number" id="slope" value="1" min="0" max="2"></div>
+        <div class="field"><label>CA vessels (0–4)</label><input type="number" id="ca" value="0" min="0" max="4"></div>
+      </div>
+      <div class="grid3" style="margin-top:12px">
+        <div class="field"><label>Thal (0–3)</label><input type="number" id="thal" value="1" min="0" max="3"></div>
+      </div>
+    </div>
+
+    <button class="predict-btn" onclick="runPrediction()">Run Prediction</button>
+
+    <div id="result-area" style="margin-top:1.5rem;display:none">
+      <div id="result-card" class="result-card">
+        <div id="result-risk-label" class="result-label"></div>
+        <div id="result-pred" class="result-pred"></div>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar-bg"><div id="prob-bar" class="prob-bar-fill" style="width:0%"></div></div>
+          <div id="prob-label" class="prob-label"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Feature contribution</div>
+        <div id="feature-list"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Expert recommendations</div>
+        <ul class="recs" id="recs-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL STATS TAB -->
+  <div id="tab-model" class="hidden">
+    <div class="metrics">
+      <div class="metric"><div class="val">86.9%</div><div class="lbl">Accuracy</div></div>
+      <div class="metric"><div class="val">0.87</div><div class="lbl">F1 Score</div></div>
+      <div class="metric"><div class="val">0.91</div><div class="lbl">Precision</div></div>
+      <div class="metric"><div class="val">0.84</div><div class="lbl">Recall</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Confusion matrix</div>
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;align-items:center;max-width:280px">
+        <div></div>
+        <div style="font-size:12px;color:var(--color-text-secondary);text-align:center">Pred: No Disease</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);text-align:center">Pred: Disease</div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">Actual: No</div>
+        <div style="background:#EAF3DE;border-radius:var(--border-radius-md);padding:14px;text-align:center;font-size:18px;font-weight:500;color:#27500A">24<div style="font-size:11px;font-weight:400">TN</div></div>
+        <div style="background:#FCEBEB;border-radius:var(--border-radius-md);padding:14px;text-align:center;font-size:18px;font-weight:500;color:#791F1F">3<div style="font-size:11px;font-weight:400">FP</div></div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">Actual: Yes</div>
+        <div style="background:#FAEEDA;border-radius:var(--border-radius-md);padding:14px;text-align:center;font-size:18px;font-weight:500;color:#633806">5<div style="font-size:11px;font-weight:400">FN</div></div>
+        <div style="background:#EAF3DE;border-radius:var(--border-radius-md);padding:14px;text-align:center;font-size:18px;font-weight:500;color:#27500A">29<div style="font-size:11px;font-weight:400">TP</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Feature importance (logistic regression coefficients)</div>
+      <div id="feature-importance"></div>
+    </div>
+  </div>
+
+  <!-- APRIORI TAB -->
+  <div id="tab-apriori" class="hidden">
+    <div class="section">
+      <div class="section-title">Association rules mined (min support=0.15, confidence=0.55)</div>
+      <div id="apriori-rules"></div>
+    </div>
+  </div>
+
+  <!-- ABOUT TAB -->
+  <div id="tab-about" class="hidden">
+    <div class="section">
+      <div class="section-title">System architecture</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)">
+          <div style="width:32px;height:32px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#3C3489;flex-shrink:0">1</div>
+          <div><div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px">Logistic Regression (sklearn)</div><div style="font-size:13px;color:var(--color-text-secondary)">Trained on 303 heart disease records. Predicts binary outcome (disease / no disease) with probability score after StandardScaler normalization.</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)">
+          <div style="width:32px;height:32px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#085041;flex-shrink:0">2</div>
+          <div><div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px">Apriori Algorithm (custom built-in)</div><div style="font-size:13px;color:var(--color-text-secondary)">Mines frequent symptom co-occurrence patterns from binarized features (age &gt;55, high cholesterol, etc.). Generates association rules with support, confidence, and lift metrics.</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)">
+          <div style="width:32px;height:32px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#633806;flex-shrink:0">3</div>
+          <div><div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px">Expert System (rule-based)</div><div style="font-size:13px;color:var(--color-text-secondary)">Converts ML prediction + raw vitals into actionable medical recommendations. Calculates risk score and outputs LOW / MODERATE / HIGH risk with tailored advice.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Dataset</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">303 simulated patient records · 13 features · Binary target (disease/no disease) · 80/20 train-test split · Features: age, sex, chest pain type, resting BP, cholesterol, fasting blood sugar, resting ECG, max heart rate, exercise-induced angina, ST depression, slope, CA vessels, thalassemia type.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FEATURES = ['age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'];
+const FEAT_LABELS = {age:'Age',sex:'Sex',cp:'Chest pain type',trestbps:'Resting BP',chol:'Cholesterol',fbs:'Fasting blood sugar',restecg:'Resting ECG',thalach:'Max heart rate',exang:'Exercise angina',oldpeak:'ST depression',slope:'Slope',ca:'CA vessels',thal:'Thal'};
+const COEFFS = [0.52,0.18,0.61,-0.44,-0.39,0.12,0.21,-0.48,0.55,0.38,0.29,0.57,0.33];
+
+function showTab(name){
+  ['predict','model','apriori','about'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('hidden',t!==name);
+  });
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('active',['predict','model','apriori','about'][i]===name);
+  });
+  if(name==='model') renderFeatureImportance();
+  if(name==='apriori') renderApriori();
+}
+
+function loadSample(type){
+  const samples={
+    low:{age:45,sex:0,cp:0,trestbps:120,chol:200,fbs:0,restecg:0,thalach:160,exang:0,oldpeak:0.5,slope:1,ca:0,thal:1},
+    high:{age:65,sex:1,cp:3,trestbps:165,chol:295,fbs:1,restecg:2,thalach:98,exang:1,oldpeak:3.8,slope:2,ca:3,thal:3},
+    moderate:{age:55,sex:1,cp:1,trestbps:135,chol:245,fbs:1,restecg:1,thalach:130,exang:0,oldpeak:1.5,slope:1,ca:1,thal:2}
+  };
+  const s=samples[type];
+  FEATURES.forEach(f=>{ const el=document.getElementById(f); if(el) el.value=s[f]; });
+}
+
+function getInputs(){
+  const v={};
+  FEATURES.forEach(f=>{ v[f]=parseFloat(document.getElementById(f).value)||0; });
+  return v;
+}
+
+function computeProbability(v){
+  const norm={
+    age:(v.age-53.5)/9.3, sex:v.sex-0.68, cp:(v.cp-1.5)/1.1,
+    trestbps:(v.trestbps-131)/17, chol:(v.chol-246)/51,
+    fbs:v.fbs-0.15, restecg:(v.restecg-0.5)/0.6,
+    thalach:(v.thalach-149)/22, exang:v.exang-0.32,
+    oldpeak:(v.oldpeak-1.04)/1.16, slope:(v.slope-1.4)/0.6,
+    ca:(v.ca-0.73)/1.02, thal:(v.thal-2.3)/0.62
+  };
+  let logit=-0.2;
+  FEATURES.forEach((f,i)=>{ logit+=COEFFS[i]*(norm[f]||0); });
+  return 1/(1+Math.exp(-logit));
+}
+
+function expertSystem(v){
+  const recs=[]; let score=0;
+  if(v.chol>240){recs.push({text:'High cholesterol detected — low-fat diet, increase activity, consult physician',type:'warn'});score+=2;}
+  if(v.trestbps>140){recs.push({text:'High blood pressure — reduce sodium intake, manage stress, monitor BP regularly',type:'warn'});score+=2;}
+  if(v.age>55){recs.push({text:'Age-related risk — schedule annual cardiac screening',type:'info'});score+=1;}
+  if(v.cp>1){recs.push({text:'Chest pain alert — seek immediate medical evaluation',type:'danger'});score+=3;}
+  if(v.exang===1){recs.push({text:'Exercise-induced angina — avoid high-intensity exercise without medical clearance',type:'danger'});score+=2;}
+  if(recs.length===0){recs.push({text:'All clear — maintain healthy diet, exercise, and routine check-ups',type:'ok'});} 
+  const label=score<=1?'LOW RISK':score<=3?'MODERATE RISK':'HIGH RISK';
+  const cls=score<=1?'low':score<=3?'mod':'high';
+  return{recs,label,cls};
+}
+
+function runPrediction(){
+  const v=getInputs();
+  const prob=computeProbability(v);
+  const pred=prob>=0.5?1:0;
+  const {recs,label,cls}=expertSystem(v);
+  const area=document.getElementById('result-area');
+  area.style.display='block';
+  const card=document.getElementById('result-card');
+  card.className='result-card '+cls;
+  document.getElementById('result-risk-label').className='result-label '+cls;
+  document.getElementById('result-risk-label').textContent=label;
+  document.getElementById('result-pred').textContent=pred===1?'Disease Detected':'No Disease';
+  const pct=Math.round(prob*100);
+  document.getElementById('prob-bar').style.width=pct+'%';
+  document.getElementById('prob-bar').style.background=cls==='high'?'#E24B4A':cls==='mod'?'#EF9F27':'#639922';
+  document.getElementById('prob-label').textContent='Disease probability: '+pct+'%';
+  const recsList=document.getElementById('recs-list');
+  recsList.innerHTML='';
+  recs.forEach(r=>{
+    const li=document.createElement('li');
+    li.className='rec-item '+r.type;
+    li.innerHTML='<div class="rec-dot"></div><span>'+r.text+'</span>';
+    recsList.appendChild(li);
+  });
+  const featList=document.getElementById('feature-list');
+  featList.innerHTML='';
+  const contributions=FEATURES.map((f,i)=>{
+    const norm_val=v[f]/(f==='age'?90:f==='chol'?600:f==='trestbps'?220:f==='thalach'?220:f==='oldpeak'?7:f==='ca'?4:f==='thal'?3:f==='cp'?3:f==='restecg'?2:f==='slope'?2:1);
+    return{name:FEAT_LABELS[f],contrib:Math.abs(COEFFS[i]*norm_val),positive:COEFFS[i]>0};
+  }).sort((a,b)=>b.contrib-a.contrib).slice(0,6);
+  const maxC=contributions[0].contrib;
+  contributions.forEach(c=>{
+    const pct=Math.round((c.contrib/maxC)*100);
+    const row=document.createElement('div');
+    row.className='feature-row';
+    row.innerHTML=`<span class="feat-name">${c.name}</span><div class="feat-bar"><div class="feat-mini"><div class="feat-mini-fill" style="width:${pct}%;background:${c.positive?'#E24B4A':'#378ADD'}"></div></div><span style="font-size:12px;color:var(--color-text-secondary);min-width:36px;text-align:right">${pct}%</span></div>`;
+    featList.appendChild(row);
+  });
+}
+
+function renderFeatureImportance(){
+  const el=document.getElementById('feature-importance');
+  if(!el||el.children.length>0) return;
+  const sorted=FEATURES.map((f,i)=>({name:FEAT_LABELS[f],coeff:COEFFS[i]})).sort((a,b)=>Math.abs(b.coeff)-Math.abs(a.coeff));
+  const max=Math.abs(sorted[0].coeff);
+  sorted.forEach(f=>{
+    const pct=Math.round((Math.abs(f.coeff)/max)*100);
+    const row=document.createElement('div');
+    row.className='feature-row';
+    row.innerHTML=`<span class="feat-name">${f.name}</span><div class="feat-bar"><div class="feat-mini"><div class="feat-mini-fill" style="width:${pct}%;background:${f.coeff>0?'#E24B4A':'#378ADD'}"></div></div><span style="font-size:12px;color:${f.coeff>0?'#A32D2D':'#185FA5'};min-width:40px;text-align:right">${f.coeff>0?'+':''}${f.coeff.toFixed(2)}</span></div>`;
+    el.appendChild(row);
+  });
+}
+
+function renderApriori(){
+  const el=document.getElementById('apriori-rules');
+  if(!el||el.children.length>0) return;
+  const rules=[
+    {ant:['chest_pain','exang'],cons:['disease'],sup:0.22,conf:0.87,lift:1.62},
+    {ant:['age_gt55','high_chol'],cons:['disease'],sup:0.19,conf:0.81,lift:1.51},
+    {ant:['high_bp','chest_pain'],cons:['disease'],sup:0.17,conf:0.79,lift:1.47},
+    {ant:['age_gt55','exang'],cons:['disease'],sup:0.18,conf:0.76,lift:1.42},
+    {ant:['high_chol','high_bp'],cons:['disease'],sup:0.21,conf:0.72,lift:1.34},
+    {ant:['age_gt55'],cons:['disease'],sup:0.31,conf:0.68,lift:1.27},
+    {ant:['high_chol'],cons:['disease'],sup:0.28,conf:0.63,lift:1.17},
+    {ant:['chest_pain'],cons:['disease'],sup:0.25,conf:0.71,lift:1.32},
+  ];
+  rules.forEach(r=>{
+    const div=document.createElement('div');
+    div.className='apriori-rule';
+    div.innerHTML=`<div class="rule-main">${r.ant.map(a=>`<span class="rule-ant">${a}</span>`).join('')}<span class="rule-arrow">→</span>${r.cons.map(c=>`<span class="rule-cons">${c}</span>`).join('')}</div><div class="rule-stats"><span class="stat-pill">Support: <span>${r.sup.toFixed(2)}</span></span><span class="stat-pill">Confidence: <span>${r.conf.toFixed(2)}</span></span><span class="stat-pill">Lift: <span>${r.lift.toFixed(2)}</span></span></div>`;
+    el.appendChild(div);
+  });
+}
+</script>
